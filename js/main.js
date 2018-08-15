@@ -164,6 +164,7 @@ var markers = []
 
   const image = document.createElement('img');
   image.className = 'restaurant-img';
+  image.alt = `image of ${restaurant.name} restaurant`;
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
   figure.append(image);
 
@@ -182,6 +183,7 @@ var markers = []
 
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
+  more.setAttribute('aria-label', `view details of ${restaurant.name} restaurant`);
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more)
 

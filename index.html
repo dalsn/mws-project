@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
@@ -15,19 +15,20 @@
     <nav>
       <h1><a href="/">Restaurant Reviews</a></h1>
     </nav>
+    <a href="#filter-options" class="skip-link">Skip to restaurants</a>
   </header>
 
   <main class="main-content">
-    <section class="map-container">
-      <div class="map" id="map"></div>
+    <section class="map-container" aria-hidden="true">
+      <div class="map" id="map" tabindex="-1" aria-hidden="true"></div>
     </section>
     <section>
-      <div class="filter-options">
+      <div aria-label="filter restaurants" class="filter-options" id="filter-options" tabindex="-1">
         <h2>Filter Results</h2>
-        <select class="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
+        <select aria-label="select a neighborhood to filter by" class="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
           <option value="all">All Neighborhoods</option>
         </select>
-        <select class="cuisines-select" name="cuisines" onchange="updateRestaurants()">
+        <select aria-label="select a cuisine to filter by" class="cuisines-select" name="cuisines" onchange="updateRestaurants()">
           <option value="all">All Cuisines</option>
         </select>
       </div>
