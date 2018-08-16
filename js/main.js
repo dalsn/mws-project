@@ -12,7 +12,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker
     .register('./sw.js', { scope: './' })
     .then((registration) => {
-      console.log("Yaaay! Service Worker registered");
+      console.log("Service worker now active");
     })
     .catch((err) => {
       console.log("Could not register Service Worker", err);
