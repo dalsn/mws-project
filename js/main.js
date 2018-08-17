@@ -16,7 +16,7 @@ if ('serviceWorker' in navigator) {
     })
     .catch((err) => {
       console.log("Could not register Service Worker", err);
-    })
+    });
 
 }
 
@@ -41,7 +41,7 @@ fetchNeighborhoods = () => {
     	fillNeighborhoodsHTML();
     }
   });
- }
+}
 
 /**
  * Set neighborhoods HTML.
@@ -54,7 +54,7 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  		option.value = neighborhood;
  		select.append(option);
  	});
- }
+}
 
 /**
  * Fetch all cuisines and set their HTML.
@@ -68,7 +68,7 @@ fetchCuisines = () => {
     	fillCuisinesHTML();
     }
   });
- }
+}
 
 /**
  * Set cuisines HTML.
@@ -82,7 +82,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
  		option.value = cuisine;
  		select.append(option);
  	});
- }
+}
 
 /**
  * Initialize leaflet map, called from HTML.
@@ -103,7 +103,7 @@ initMap = () => {
  	}).addTo(newMap);
 
  	updateRestaurants();
- }
+}
 
 /* window.initMap = () => {
   let loc = {
@@ -138,8 +138,8 @@ updateRestaurants = () => {
     	resetRestaurants(restaurants);
     	fillRestaurantsHTML();
     }
-  })
- }
+  });
+}
 
 /**
  * Clear current restaurants, their HTML and remove their map markers.
@@ -167,7 +167,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  		ul.append(createRestaurantHTML(restaurant));
  	});
  	addMarkersToMap();
- }
+}
 
 /**
  * Create restaurant HTML.
@@ -206,7 +206,7 @@ createRestaurantHTML = (restaurant) => {
  	li.append(more)
 
  	return li
- }
+}
 
 /**
  * Add markers for current restaurants to the map.
@@ -221,7 +221,7 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     }
     self.markers.push(marker);
   });
- }
+}
 
 /* addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
