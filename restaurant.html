@@ -21,7 +21,7 @@
 		</nav>
 		<a href="#restaurant-container" class="skip-link">Skip to restaurants</a>
 		<!-- Beginning breadcrumb -->
-		<ul role="navigation" class="breadcrumb" >
+		<ul role="navigation" aria-label="breadcrumb" class="breadcrumb">
 			<li><a href="/">Home</a></li>
 		</ul>
 		<!-- End breadcrumb -->
@@ -32,12 +32,12 @@
 	<!-- Beginning main -->
 	<main class="main-content">
 		<!-- Beginning map -->
-		<section role="presentation" class="map-container">
-			<div aria-label="map of restaurants" class="map" id="map"></div>
+		<section class="map-container">
+			<div role="application" aria-label="map with restaurant" class="map" id="map"></div>
 		</section>
 		<!-- End map -->
 		<!-- Beginning restaurant -->
-		<section class="restaurant-container" id="restaurant-container" tabindex="-1">
+		<section class="restaurant-container" id="restaurant-container">
 			<h2 class="restaurant-name"></h2>
 			<figure>
 				<img class="restaurant-img">
