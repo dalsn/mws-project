@@ -1,3 +1,27 @@
+let dbPromise;
+
+/**
+ * Check for service worker and register it
+ */
+if ('serviceWorker' in navigator) {
+
+  navigator.serviceWorker
+    .register('./sw.js', { scope: './' })
+    .then((registration) => {
+      console.log("Service worker now active");
+    })
+    .catch((err) => {
+      console.log("Could not register Service Worker", err);
+    });
+
+    dbPromise = idb.open('restaurant', 1, (upgradeDb) => {
+      let store = upgradeDb.createObjectStore('restaurants', {
+        keyPath: 'id'
+      });
+      store.createIndex('by-id', 'id');
+    });
+}
+
 /**
  * Common database helper functions.
  */
@@ -8,27 +32,64 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 8000 // Change this to your server port
-    return `data/restaurants.json`;
+    const port = 1337 // Change this to your server port
+    return `http://localhost:${port}/restaurants`;
+  }
+
+  static fetchRestaurantsFromDB() {
+    return dbPromise.then((db) => {
+      if (!db) return null;
+
+      const tx = db.transaction('restaurants', 'readwrite');
+      const index = tx.objectStore('restaurants').index('by-id');
+
+      return index.getAll().then((response) => {
+        if (!response)
+          return null;
+        return response;
+      });
+    });
+  }
+
+  /**
+   * Fetch all restaurants from remote server.
+   */
+  static fetchRestaurantsFromServer(callback) {
+    fetch(DBHelper.DATABASE_URL)
+      .then(response => {
+        return response.json();
+      })
+      .then(restaurants => {
+        dbPromise.then((db) => {
+            if (!db) return;
+            const tx1 = db.transaction('restaurants', 'readwrite');
+            const store1 = tx1.objectStore('restaurants');
+            restaurants.forEach((restaurant) => {
+              store1.put(restaurant);
+            })
+
+        });
+        callback(null, restaurants);
+      })
+      .catch(error => {
+        callback(error, null);
+      });
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', DBHelper.DATABASE_URL);
-    xhr.onload = () => {
-      if (xhr.status === 200) { // Got a success response from server!
-        const json = JSON.parse(xhr.responseText);
-        const restaurants = json.restaurants;
-        callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
-        const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
-      }
-    };
-    xhr.send();
+    if (dbPromise) {
+      DBHelper.fetchRestaurantsFromDB()
+        .then(restaurants => {
+          if (restaurants.length > 0) {
+            callback(null, restaurants);
+          } else {
+            DBHelper.fetchRestaurantsFromServer(callback);
+          }
+        });
+    }
   }
 
   /**
@@ -150,7 +211,10 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`img/${restaurant.photograph}`);
+    if (! restaurant.hasOwnProperty("photograph")) {
+      restaurant.photograph = "10";
+    }
+    return (`/img/${restaurant.photograph}.jpg`);
   }
 
   /**
