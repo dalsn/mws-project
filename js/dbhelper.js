@@ -1,3 +1,5 @@
+let dbPromise;
+
 /**
  * Check for service worker and register it
  */
@@ -12,6 +14,12 @@ if ('serviceWorker' in navigator) {
       console.log("Could not register Service Worker", err);
     });
 
+    dbPromise = idb.open('restaurant', 1, (upgradeDb) => {
+      let store = upgradeDb.createObjectStore('restaurants', {
+        keyPath: 'id'
+      });
+      store.createIndex('by-id', 'id');
+    });
 }
 
 /**
@@ -28,20 +36,60 @@ class DBHelper {
     return `http://localhost:${port}/restaurants`;
   }
 
+  static fetchRestaurantsFromDB() {
+    return dbPromise.then((db) => {
+      if (!db) return null;
+
+      const tx = db.transaction('restaurants', 'readwrite');
+      const index = tx.objectStore('restaurants').index('by-id');
+
+      return index.getAll().then((response) => {
+        if (!response)
+          return null;
+        return response;
+      });
+    });
+  }
+
   /**
-   * Fetch all restaurants.
+   * Fetch all restaurants from remote server.
    */
-  static fetchRestaurants(callback) {
+  static fetchRestaurantsFromServer(callback) {
     fetch(DBHelper.DATABASE_URL)
       .then(response => {
         return response.json();
       })
       .then(restaurants => {
+        dbPromise.then((db) => {
+            if (!db) return;
+            const tx1 = db.transaction('restaurants', 'readwrite');
+            const store1 = tx1.objectStore('restaurants');
+            restaurants.forEach((restaurant) => {
+              store1.put(restaurant);
+            })
+
+        });
         callback(null, restaurants);
       })
       .catch(error => {
         callback(error, null);
-      })
+      });
+  }
+
+  /**
+   * Fetch all restaurants.
+   */
+  static fetchRestaurants(callback) {
+    if (dbPromise) {
+      DBHelper.fetchRestaurantsFromDB()
+        .then(restaurants => {
+          if (restaurants.length > 0) {
+            callback(null, restaurants);
+          } else {
+            DBHelper.fetchRestaurantsFromServer(callback);
+          }
+        });
+    }
   }
 
   /**

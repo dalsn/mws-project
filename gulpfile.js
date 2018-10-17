@@ -23,7 +23,10 @@ gulp.task("dist", [
 	"copy-html",
 	"images-dist",
 	"scripts-dist"
-]);
+], function() {
+	gulp.src("./manifest.json")
+		.pipe(gulp.dest("./dist"));
+});
 
 gulp.task("styles", function() {
 	gulp.src(["sass/**/*.scss"])
