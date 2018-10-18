@@ -37,6 +37,8 @@ class DBHelper {
   }
 
   static fetchRestaurantsFromDB() {
+    if (!dbPromise) return null;
+
     return dbPromise.then((db) => {
       if (!db) return null;
 
@@ -67,7 +69,6 @@ class DBHelper {
             restaurants.forEach((restaurant) => {
               store1.put(restaurant);
             })
-
         });
         callback(null, restaurants);
       })
@@ -80,16 +81,18 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    if (dbPromise) {
-      DBHelper.fetchRestaurantsFromDB()
-        .then(restaurants => {
-          if (restaurants.length > 0) {
-            callback(null, restaurants);
-          } else {
-            DBHelper.fetchRestaurantsFromServer(callback);
-          }
-        });
-    }
+    DBHelper.fetchRestaurantsFromDB()
+      .then(restaurants => {
+        if (restaurants.length > 0) {
+          callback(null, restaurants);
+        } else {
+          DBHelper.fetchRestaurantsFromServer(callback);
+        }
+      })
+      .catch(e => {
+        console.log(e);
+        DBHelper.fetchRestaurantsFromServer(callback);
+      })
   }
 
   /**
