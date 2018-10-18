@@ -1,6 +1,6 @@
 'use strict';
 
-var cacheName = 'restaurantReview-v3';
+var cacheName = 'restaurantReview-v1';
 
 var filesToCache = ['./', './index.html', './restaurant.html', './js/main.js', './js/restaurant_info.js', './js/db.js', './css/styles.css', 'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css', 'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js'];
 
