@@ -30,8 +30,7 @@ gulp.task("dist", [
 
 gulp.task("styles", function() {
 	gulp.src(["sass/**/*.scss"])
-		.pipe(sass({outputStyle: 'compressed'}))
-		.pipe(sass().on("error", sass.logError))
+		.pipe(sass({outputStyle: 'compressed'}).on("error", sass.logError))
 		.pipe(gulp.dest("dist/css"))
 		.pipe(browserSync.stream());
 });
