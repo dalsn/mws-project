@@ -631,3 +631,30 @@ input[class="super-sad"]:focus + svg {
     border: none;
     border-radius: .3em;
 }
+
+.red-heart-checkbox {
+  visibility: hidden;
+}
+
+.red-heart-checkbox:checked + label:before {
+  content: "";
+  color: #F00;
+}
+
+.red-heart-checkbox + label:before {
+  content: "";
+  font-family: FontAwesome;
+  font-size: 2em;
+  content: "";
+  transition: all 0.3s;
+  color: #888;
+}
+
+.red-heart-checkbox + label:hover:before {
+  transform: scale(1.2);
+}
+
+.control-group {
+	text-align: center;
+	margin-left: -1.5em;
+}
