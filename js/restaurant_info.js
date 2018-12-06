@@ -161,7 +161,7 @@ function createReviewHTML(review) {
 
  	const date = document.createElement('span');
  	date.className = 'review-date';
- 	date.innerHTML = review.date;
+ 	date.innerHTML = new Date(review.updatedAt).toDateString();
  	header.appendChild(date);
 
  	const body = document.createElement('div');

@@ -19,6 +19,16 @@ if ('serviceWorker' in navigator) {
         keyPath: 'id'
       });
       store.createIndex('by-id', 'id');
+
+      let store1 = upgradeDb.createObjectStore("reviews", {
+        keyPath: 'id'
+      });
+      store1.createIndex("by-restaurant", "restaurant_id");
+
+      let store2 = upgradeDb.createObjectStore("savedReviews", {
+        keyPath: 'id'
+      });
+      store2.createIndex("by-id", "id");
     });
 }
 
@@ -31,9 +41,9 @@ class DBHelper {
    * Database URL.
    * Change this to restaurants.json file location on your server.
    */
-  static get DATABASE_URL() {
+  static DATABASE_URL(path) {
     const port = 1337 // Change this to your server port
-    return `http://localhost:${port}/restaurants`;
+    return `http://localhost:${port}/${path}`;
   }
 
   static fetchRestaurantsFromDB() {
@@ -57,7 +67,7 @@ class DBHelper {
    * Fetch all restaurants from remote server.
    */
   static fetchRestaurantsFromServer(callback) {
-    fetch(DBHelper.DATABASE_URL)
+    fetch(DBHelper.DATABASE_URL('restaurants'))
       .then(response => {
         return response.json();
       })
@@ -75,6 +85,99 @@ class DBHelper {
       .catch(error => {
         callback(error, null);
       });
+  }
+
+  static fetchReviewsFromDB() {
+    if (!dbPromise) return null;
+
+    return dbPromise.then((db) => {
+      if (!db) return null;
+
+      const tx = db.transaction('reviews', 'readwrite');
+      const index = tx.objectStore('reviews').index('by-restaurant');
+
+      return index.getAll().then((response) => {
+        if (!response)
+          return null;
+        return response;
+      });
+    });
+  }
+
+  static fetchReviewsFromServer() {
+    return fetch(DBHelper.DATABASE_URL('reviews'))
+      .then(response => {
+        return response.json();
+      })
+      .then(reviews => {
+        dbPromise.then((db) => {
+            if (!db) return;
+            const tx1 = db.transaction('reviews', 'readwrite');
+            const store1 = tx1.objectStore('reviews');
+            reviews.forEach((review) => {
+              store1.put(review);
+            })
+        });
+        return reviews;
+      })
+      .catch(error => {
+        console.log(error);
+        return null;
+      });
+  }
+
+  static saveReviewToDB(data) {
+    if (!dbPromise) return false;
+
+    dbPromise.then((db) => {
+      if (!db) return;
+
+      const tx1 = db.transaction('reviews', 'readwrite');
+      const store1 = tx1.objectStore('reviews');
+
+      const tx2 = db.transaction("savedReviews", "readwrite");
+      const store2 = tx2.objectStore("savedReviews");
+
+      store1.put(data);
+      store2.put(data);
+      return tx1.complete && tx2.complete;
+    })
+    .then(() => console.log('Review saved in DB'))
+    .catch(error => {
+      console.log(error);
+      return false;
+    });
+  }
+
+  static fetchReviews() {
+    if (navigator.onLine) {
+      return DBHelper.fetchReviewsFromServer();
+    } else {
+      return DBHelper.fetchReviewsFromDB()
+      .then(reviews => {
+        if (reviews.length > 0) {
+          return reviews;
+        } else {
+          return null;
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        return DBHelper.fetchReviewsFromServer();
+      })
+    }
+  }
+
+  static fetchReviewsByRestaurant(restaurant, callback) {
+    DBHelper.fetchReviews()
+      .then(reviews => {
+        const restaurantReviews = reviews.filter(r => r.restaurant_id == restaurant.id);
+        restaurant.reviews = restaurantReviews;
+        callback(null, restaurant);
+      })
+      .catch(error => {
+        callback(error, null);
+      })
   }
 
   /**
@@ -106,7 +209,8 @@ class DBHelper {
       } else {
         const restaurant = restaurants.find(r => r.id == id);
         if (restaurant) { // Got the restaurant
-          callback(null, restaurant);
+          DBHelper.fetchReviewsByRestaurant(restaurant, callback);
+          // callback(null, restaurant);
         } else { // Restaurant does not exist in the database
           callback('Restaurant does not exist', null);
         }

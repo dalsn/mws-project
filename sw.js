@@ -1,4 +1,4 @@
-let cacheName = 'restaurantReview-v1';
+let cacheName = 'restaurantReview-v2';
 
 let filesToCache = [
 	'./',
@@ -9,7 +9,8 @@ let filesToCache = [
 	'./js/db.js',
 	'./css/styles.css',
 	'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
-	'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js'
+	'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js',
+	'https://fonts.googleapis.com/css?family=Work+Sans'
 ];
 
 self.addEventListener('install', (e) => {
