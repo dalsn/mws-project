@@ -10,6 +10,7 @@ const browserSync = require("browser-sync").create();
 gulp.task("default", ["styles", "copy-html", "copy-images", "scripts"], function() {
 	gulp.watch("sass/**/*.scss", ["styles"]);
 	gulp.watch(["js/**/*.js", "./sw.js"], ["scripts"]);
+	gulp.watch("*.html", ["copy-html"]);
 	gulp.watch("./dist/*.html")
 		.on("change", browserSync.reload);
 

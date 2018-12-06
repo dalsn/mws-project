@@ -18,7 +18,7 @@ p {
 }
 
 body {
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: 'Work Sans', Arial, Helvetica, sans-serif;
 	font-size: 100%;
 	background-color: #fdfdfd;
 	width: 100%;
@@ -28,7 +28,7 @@ body {
 
 ul,
 li {
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: 'Work Sans', Arial, Helvetica, sans-serif;
 	font-size: 1em;
 	color: #333;
 	margin: 0;
@@ -40,15 +40,21 @@ a {
 }
 
 :focus {
-	-webkit-box-shadow: 0px 0px 35px 5px rgba(0,0,0,0.72);
-	-moz-box-shadow: 0px 0px 35px 5px rgba(0,0,0,0.72);
-	box-shadow: 0px 0px 35px 5px rgba(0,0,0,0.72);
+	-webkit-box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.3);
+	-moz-box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.3);
+	box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.3);
 }
 
 a:hover,
 a:focus {
 	color: #3397db;
 	text-decoration: none;
+}
+
+a:focus {
+	-webkit-box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
+	-moz-box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
+	box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
 }
 
 a img{
@@ -61,7 +67,7 @@ h3,
 h4,
 h5,
 h6 {
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: 'Work Sans', Arial, Helvetica, sans-serif;
 	margin: 0 0 20px;
 }
 
@@ -198,7 +204,7 @@ nav h1 a {
 .filter-options select {
 	background-color: white;
 	border: 1px solid #fff;
-	font-family: Arial,sans-serif;
+	font-family: 'Work Sans', Arial,sans-serif;
 	font-size: 1em;
 	height: 35px;
 	letter-spacing: 0;
@@ -243,7 +249,7 @@ nav h1 a {
 
 .restaurants-list li {
 	background-color: #fff;
-	font-family: Arial,sans-serif;
+	font-family: 'Work Sans', Arial,sans-serif;
 	margin: 15px 30px;
 	padding: 20px 20px;
 	text-align: left;
@@ -282,7 +288,7 @@ nav h1 a {
 
 .restaurants-list .restaurant figcaption {
 	color: #b7410e;
-	font-family: Arial,sans-serif;
+	font-family: 'Work Sans', Arial,sans-serif;
 	font-size: 1.3em;
 	font-weight: 200;
 	letter-spacing: 0;
@@ -383,7 +389,7 @@ nav h1 a {
 
 .restaurant-name {
 	color: #b7410e;
-	font-family: Arial,sans-serif;
+	font-family: 'Work Sans', Arial,sans-serif;
 	font-size: 1.5em;
 	font-weight: 200;
 	letter-spacing: 0;
@@ -533,4 +539,95 @@ nav h1 a {
 
 .leaflet-control a {
 	color: #b7410e !important;
+}
+
+/* ====================== Restaurant Review ====================== */
+.add-review {
+	padding-top: 1em;
+	border-top: 1px solid #fff;
+	margin: 15px 0;
+}
+
+.form-group {
+	width: 100%;
+	margin-bottom: 1em;
+}
+
+.form-control {
+	width: calc(100% - 20px);
+	padding: .5em;
+	border-radius: .3em;
+}
+
+svg {
+	height: 2rem;
+	width: 2rem;
+	margin: 0.2rem;
+}
+
+.rating-form-2 svg {
+	height: 3rem;
+	width: 3rem;
+	margin: 0.5rem;
+}
+
+#radios label {
+	position: relative;
+}
+
+input[type="radio"] {
+	position: absolute;
+	opacity: 0;
+}
+
+input[type="radio"] + svg {
+	-webkit-transition: all 0.2s;
+	transition: all 0.2s;
+}
+
+input + svg {
+	cursor: pointer;
+}
+
+input[class="super-happy"]:hover + svg,
+input[class="super-happy"]:checked + svg,
+input[class="super-happy"]:focus + svg {
+	fill: rgb(0, 109, 217);
+}
+
+input[class="happy"]:hover + svg,
+input[class="happy"]:checked + svg,
+input[class="happy"]:focus + svg {
+	fill: rgb(0, 204, 79);
+}
+
+input[class="neutral"]:hover + svg,
+input[class="neutral"]:checked + svg,
+input[class="neutral"]:focus + svg {
+	fill: rgb(232, 214, 0);
+}
+
+input[class="sad"]:hover + svg,
+input[class="sad"]:checked + svg,
+input[class="sad"]:focus + svg {
+	fill: rgb(229, 132, 0);
+}
+
+input[class="super-sad"]:hover + svg,
+input[class="super-sad"]:checked + svg,
+input[class="super-sad"]:focus + svg {
+	fill: rgb(239, 42, 16);
+}
+
+.btn {
+	background-color: #b7410e;
+    color: #fff;
+    display: inline-block;
+    font-size: 1em;
+    padding: 8px 30px 10px;
+    text-align: center;
+    width: calc(100% - 5px);
+    transition: all 0.5s;
+    border: none;
+    border-radius: .3em;
 }
