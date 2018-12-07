@@ -50,7 +50,8 @@ gulp.task("scripts-dist", function() {
 
 	gulp.src([
 		"js/main.js",
-		"js/restaurant_info.js"
+		"js/restaurant_info.js",
+		"js/worker.js"
 	])
 		.pipe(babel({
 			presets: ['babel-preset-env'].map(require.resolve)
@@ -79,7 +80,8 @@ gulp.task("scripts", function() {
 
 	gulp.src([
 		"js/main.js",
-		"js/restaurant_info.js"
+		"js/restaurant_info.js",
+		"js/worker.js"
 	])
 		.pipe(babel({
 			presets: ['babel-preset-env'].map(require.resolve)

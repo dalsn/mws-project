@@ -1,4 +1,5 @@
 let dbPromise;
+let webWorker;
 
 /**
  * Check for service worker and register it
@@ -13,6 +14,8 @@ if ('serviceWorker' in navigator) {
     .catch((err) => {
       console.error("Could not register Service Worker", err);
     });
+
+    webWorker = new Worker('./js/worker.js');
 
     dbPromise = idb.open('restaurant', 1, upgradeDb => {
       let store = upgradeDb.createObjectStore('restaurants', {
@@ -87,7 +90,7 @@ class DBHelper {
         return response.json();
       })
       .then(restaurants => {
-        dbPromise.then((db) => {
+        dbPromise.then(db => {
             if (!db) return;
             const tx1 = db.transaction('restaurants', 'readwrite');
             const store1 = tx1.objectStore('restaurants');
@@ -149,8 +152,8 @@ class DBHelper {
     });
   }
 
-  static fetchReviewsFromServer() {
-    return fetch(DBHelper.DATABASE_URL('reviews'))
+  static fetchReviewsFromServer(id) {
+    return fetch(DBHelper.DATABASE_URL(`reviews/?restaurant_id=${id}`))
       .then(response => {
         return response.json();
       })
@@ -177,12 +180,12 @@ class DBHelper {
         if (reviews.length > 0) {
           return reviews;
         } else {
-          return DBHelper.fetchReviewsFromServer();
+          return DBHelper.fetchReviewsFromServer(id);
         }
       })
       .catch(e => {
         console.error(e);
-        return DBHelper.fetchReviewsFromServer();
+        return DBHelper.fetchReviewsFromServer(id);
       });
   }
 
@@ -190,8 +193,8 @@ class DBHelper {
     DBHelper.fetchReviews(restaurant.id)
       .then(reviews => {
         if (reviews.length > 0) {
-          const restaurantReviews = reviews.filter(r => r.restaurant_id == restaurant.id);
-          restaurant.reviews = restaurantReviews;
+          // const restaurantReviews = reviews.filter(r => r.restaurant_id == restaurant.id);
+          restaurant.reviews = reviews;
         }
         callback(null, restaurant);
       })
@@ -397,5 +400,9 @@ class DBHelper {
     return marker;
   } */
 
+}
+
+if (webWorker) {
+  setTimeout(webWorker.postMessage("save"), 120 * 1000); //run web worker every 2 minutes
 }
 
