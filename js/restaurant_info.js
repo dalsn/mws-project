@@ -141,6 +141,8 @@ function fillReviewsHTML(reviews = self.restaurant.reviews) {
  	title.innerHTML = 'Reviews';
  	container.appendChild(title);
 
+  showAddReviewHTML();
+
  	if (!reviews) {
  		const noReviews = document.createElement('p');
  		noReviews.innerHTML = 'No reviews yet!';
@@ -152,7 +154,6 @@ function fillReviewsHTML(reviews = self.restaurant.reviews) {
  		ul.appendChild(createReviewHTML(review));
  	});
  	container.appendChild(ul);
-  showAddReviewHTML();
 }
 
 /**
