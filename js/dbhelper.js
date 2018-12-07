@@ -11,24 +11,27 @@ if ('serviceWorker' in navigator) {
       console.log("Service worker now active");
     })
     .catch((err) => {
-      console.log("Could not register Service Worker", err);
+      console.error("Could not register Service Worker", err);
     });
 
-    dbPromise = idb.open('restaurant', 1, (upgradeDb) => {
+    dbPromise = idb.open('restaurant', 1, upgradeDb => {
       let store = upgradeDb.createObjectStore('restaurants', {
         keyPath: 'id'
       });
       store.createIndex('by-id', 'id');
 
       let store1 = upgradeDb.createObjectStore("reviews", {
-        keyPath: 'id'
+        keyPath: 'id',
+        autoIncrement: true
       });
       store1.createIndex("by-restaurant", "restaurant_id");
 
       let store2 = upgradeDb.createObjectStore("savedReviews", {
-        keyPath: 'id'
+        keyPath: 'id',
+        autoIncrement: true
       });
       store2.createIndex("by-id", "id");
+      store2.createIndex("by-restaurant", "restaurant_id");
     });
 }
 
@@ -44,6 +47,13 @@ class DBHelper {
   static DATABASE_URL(path) {
     const port = 1337 // Change this to your server port
     return `http://localhost:${port}/${path}`;
+  }
+
+  static toast(message) {
+    let toast = document.querySelector('#toast');
+    toast.innerHTML = message;
+    toast.className = "show";
+    setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 4000);
   }
 
   static fetchRestaurantsFromDB() {
@@ -87,7 +97,24 @@ class DBHelper {
       });
   }
 
-  static fetchReviewsFromDB() {
+  static saveReview(review) {
+    return dbPromise
+      .then((db) => {
+        if (!db) return;
+        const tx1 = db.transaction('savedReviews', 'readwrite');
+        const store1 = tx1.objectStore('savedReviews');
+
+        const tx = db.transaction('reviews', 'readwrite');
+        const store = tx.objectStore('reviews');
+
+        store1.add(review);
+        store.add(review);
+
+        return tx.complete && tx1.complete;
+      });
+  }
+
+  static fetchReviewsFromDB(id) {
     if (!dbPromise) return null;
 
     return dbPromise.then((db) => {
@@ -96,7 +123,7 @@ class DBHelper {
       const tx = db.transaction('reviews', 'readwrite');
       const index = tx.objectStore('reviews').index('by-restaurant');
 
-      return index.getAll().then((response) => {
+      return index.getAll(id).then((response) => {
         if (!response)
           return null;
         return response;
@@ -121,55 +148,28 @@ class DBHelper {
         return reviews;
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
         return null;
       });
   }
 
-  static saveReviewToDB(data) {
-    if (!dbPromise) return false;
-
-    dbPromise.then((db) => {
-      if (!db) return;
-
-      const tx1 = db.transaction('reviews', 'readwrite');
-      const store1 = tx1.objectStore('reviews');
-
-      const tx2 = db.transaction("savedReviews", "readwrite");
-      const store2 = tx2.objectStore("savedReviews");
-
-      store1.put(data);
-      store2.put(data);
-      return tx1.complete && tx2.complete;
-    })
-    .then(() => console.log('Review saved in DB'))
-    .catch(error => {
-      console.log(error);
-      return false;
-    });
-  }
-
-  static fetchReviews() {
-    if (navigator.onLine) {
-      return DBHelper.fetchReviewsFromServer();
-    } else {
-      return DBHelper.fetchReviewsFromDB()
+  static fetchReviews(id) {
+    return DBHelper.fetchReviewsFromDB(id)
       .then(reviews => {
         if (reviews.length > 0) {
           return reviews;
         } else {
-          return null;
+          return DBHelper.fetchReviewsFromServer();
         }
       })
       .catch(e => {
         console.error(e);
         return DBHelper.fetchReviewsFromServer();
-      })
-    }
+      });
   }
 
   static fetchReviewsByRestaurant(restaurant, callback) {
-    DBHelper.fetchReviews()
+    DBHelper.fetchReviews(restaurant.id)
       .then(reviews => {
         const restaurantReviews = reviews.filter(r => r.restaurant_id == restaurant.id);
         restaurant.reviews = restaurantReviews;
@@ -193,7 +193,7 @@ class DBHelper {
         }
       })
       .catch(e => {
-        console.log(e);
+        console.error(e);
         DBHelper.fetchRestaurantsFromServer(callback);
       })
   }
@@ -305,6 +305,31 @@ class DBHelper {
         callback(null, uniqueCuisines);
       }
     });
+  }
+
+  static toggleFavorite(restaurant_id) {
+    return DBHelper.fetchRestaurantsFromDB()
+      .then((restaurants) => {
+        if (restaurants) {
+          const restaurant = restaurants.find(r => r.id == restaurant_id);
+          if (restaurant) {
+            if (!dbPromise) return null;
+
+            return dbPromise.then((db) => {
+              if (!db) return null;
+
+              const tx = db.transaction('restaurants', 'readwrite');
+              const store = tx.objectStore('restaurants');
+
+              restaurant.is_favorite = !JSON.parse(restaurant.is_favorite);
+              store.put(restaurant);
+
+              return tx.complete;
+            });
+          }
+        }
+      })
+      .catch(error => console.error(error));
   }
 
   /**

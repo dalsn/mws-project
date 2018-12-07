@@ -55,10 +55,10 @@ function initMap() {
  * Get current restaurant from page URL.
  */
 function fetchRestaurantFromURL(callback) {
-  if (self.restaurant) { // restaurant already fetched!
-  	callback(null, self.restaurant)
-  	return;
-  }
+  // if (self.restaurant) {
+  // 	callback(null, self.restaurant)
+  // 	return;
+  // }
   const id = getParameterByName('id');
   if (!id) { // no id found in URL
   	error = 'No restaurant id in URL'
@@ -86,6 +86,9 @@ function fillRestaurantHTML(restaurant = self.restaurant) {
  	const address = document.querySelector('.restaurant-address');
  	address.innerHTML = restaurant.address;
 
+  const restaurantId = document.querySelector('#restaurant_id');
+  restaurantId.value = restaurant.id;
+
  	const image = document.querySelector('.restaurant-img');
  	image.className = 'restaurant-img'
  	image.alt = `image of ${restaurant.name} restaurant`;
@@ -93,6 +96,11 @@ function fillRestaurantHTML(restaurant = self.restaurant) {
 
  	const cuisine = document.querySelector('.restaurant-cuisine');
  	cuisine.innerHTML = restaurant.cuisine_type;
+
+  if (restaurant.is_favorite) {
+    const fav = document.querySelector('.red-heart-checkbox');
+    fav.checked = JSON.parse(restaurant.is_favorite);
+  }
 
   // fill operating hours
   if (restaurant.operating_hours) {
@@ -205,3 +213,50 @@ function getParameterByName(name, url) {
  		return '';
  	return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
+
+function favorite() {
+  const id = document.querySelector('#restaurant_id').value;
+  DBHelper.toggleFavorite(id)
+    .then(() => {
+      DBHelper.toast("Updated!");
+    });
+}
+
+function clearForm() {
+  document.querySelector('#name').value = "";
+  document.querySelector('input[name=rating]:checked').checked = false;
+  document.querySelector('#comments').value = "";
+}
+
+document.querySelector('.red-heart-checkbox').addEventListener('click', event => {
+  favorite();
+});
+
+document.querySelector('#addReview').addEventListener('submit', event => {
+  event.preventDefault();
+  let name = document.querySelector('#name').value;
+  let rating = document.querySelector('input[name=rating]:checked').value;
+  let comments = document.querySelector('#comments').value;
+  let restaurant_id = document.querySelector('#restaurant_id').value;
+
+  let review = {
+    'restaurant_id': parseInt(restaurant_id),
+    name,
+    rating,
+    comments,
+    'createdAt': new Date().getTime(),
+    'updatedAt': new Date().getTime()
+  }
+
+  DBHelper.saveReview(review)
+    .then(() => {
+      fetchRestaurantFromURL((error, restaurant) => {
+        if (error) {
+          console.error(error);
+        } else {
+          DBHelper.toast('Added review successfully');
+          clearForm();
+        }
+      });
+    });
+});
