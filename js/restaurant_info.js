@@ -15,6 +15,7 @@ function initMap() {
  	fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
     	console.error(error);
+      DBHelper.toast("Could not download content from remote server");
     } else {
     	self.newMap = L.map('map', {
     		center: [restaurant.latlng.lat, restaurant.latlng.lng],
@@ -68,6 +69,7 @@ function fetchRestaurantFromURL(callback) {
   		self.restaurant = restaurant;
   		if (!restaurant) {
   			console.error(error);
+        callback(error, null);
   			return;
   		}
   		fillRestaurantHTML();
@@ -150,6 +152,7 @@ function fillReviewsHTML(reviews = self.restaurant.reviews) {
  		ul.appendChild(createReviewHTML(review));
  	});
  	container.appendChild(ul);
+  showAddReviewHTML();
 }
 
 /**
@@ -196,6 +199,11 @@ function fillBreadcrumb(restaurant=self.restaurant) {
  	const li = document.createElement('li');
  	li.innerHTML = restaurant.name;
  	breadcrumb.appendChild(li);
+}
+
+function showAddReviewHTML() {
+  const form = document.querySelector('#addReview');
+  form.className = "show";
 }
 
 /**

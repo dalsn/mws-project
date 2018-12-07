@@ -20,6 +20,7 @@ function fetchNeighborhoods() {
  	DBHelper.fetchNeighborhoods((error, neighborhoods) => {
     if (error) { // Got an error
     	console.error(error);
+      DBHelper.toast("Could not download content from remote server");
     } else {
     	self.neighborhoods = neighborhoods;
     	fillNeighborhoodsHTML();
@@ -47,6 +48,7 @@ function fetchCuisines() {
  	DBHelper.fetchCuisines((error, cuisines) => {
     if (error) { // Got an error!
     	console.error(error);
+      DBHelper.toast("Could not download content from remote server");
     } else {
     	self.cuisines = cuisines;
     	fillCuisinesHTML();
@@ -118,6 +120,7 @@ function updateRestaurants() {
  	DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
     if (error) { // Got an error!
     	console.error(error);
+      DBHelper.toast("Could not download content from remote server");
     } else {
     	resetRestaurants(restaurants);
     	fillRestaurantsHTML();

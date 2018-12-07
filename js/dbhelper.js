@@ -32,6 +32,11 @@ if ('serviceWorker' in navigator) {
       });
       store2.createIndex("by-id", "id");
       store2.createIndex("by-restaurant", "restaurant_id");
+
+      let store3 = upgradeDb.createObjectStore("savedFavorites", {
+        keyPath: 'restaurant_id'
+      });
+      store3.createIndex("by-restaurant", "restaurant_id");
     });
 }
 
@@ -114,6 +119,19 @@ class DBHelper {
       });
   }
 
+  static saveFavorite(data) {
+    return dbPromise
+      .then((db) => {
+        if (!db) return;
+        const tx1 = db.transaction('savedFavorites', 'readwrite');
+        const store1 = tx1.objectStore('savedFavorites');
+
+        store1.put(data);
+
+        return tx1.complete;
+      });
+  }
+
   static fetchReviewsFromDB(id) {
     if (!dbPromise) return null;
 
@@ -171,8 +189,10 @@ class DBHelper {
   static fetchReviewsByRestaurant(restaurant, callback) {
     DBHelper.fetchReviews(restaurant.id)
       .then(reviews => {
-        const restaurantReviews = reviews.filter(r => r.restaurant_id == restaurant.id);
-        restaurant.reviews = restaurantReviews;
+        if (reviews.length > 0) {
+          const restaurantReviews = reviews.filter(r => r.restaurant_id == restaurant.id);
+          restaurant.reviews = restaurantReviews;
+        }
         callback(null, restaurant);
       })
       .catch(error => {
@@ -324,7 +344,11 @@ class DBHelper {
               restaurant.is_favorite = !JSON.parse(restaurant.is_favorite);
               store.put(restaurant);
 
-              return tx.complete;
+              return DBHelper.saveFavorite({
+                'restaurant_id': restaurant.id,
+                'is_favorite': restaurant.is_favorite
+              });
+
             });
           }
         }

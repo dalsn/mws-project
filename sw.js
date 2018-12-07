@@ -1,4 +1,4 @@
-let cacheName = 'restaurantReview-v2';
+let cacheName = 'restaurantReview-v1';
 
 let filesToCache = [
 	'./',
