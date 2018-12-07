@@ -18,3 +18,5 @@ In a terminal, check the version of Python you have: `python -V`. If you have Py
 If you however have PHP (LAMP/WAMP/XAMPP) installed instead, spin up the server with `php -S localhost:8000`.
 
 5. With your server running, visit the site: `http://localhost:8000`. Viola!
+
+Live site: https://dalsn.github.io/mws
