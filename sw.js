@@ -28,22 +28,25 @@ self.addEventListener('install', (e) => {
 * otherwise request resource over network and cache response
 */
 self.addEventListener('fetch', (e) => {
-	let requestUrl = new URL(e.request.url);
-	if (requestUrl.protocol.startsWith('http')) {
-		e.respondWith(
-			caches.open(cacheName)
-			.then((cache) => {
-				return cache.match(e.request, { ignoreSearch: true }).then((response) => {
-					if (response) {
-						return response;
-					}
+	if (e.request.method == 'GET') {
+		let requestUrl = new URL(e.request.url);
+		if (requestUrl.protocol.startsWith('http')) {
+			e.respondWith(
+				caches.open(cacheName)
+				.then((cache) => {
+					return cache.match(e.request, { ignoreSearch: true }).then((response) => {
+						if (response) {
+							return response;
+						}
 
-					return fetch(e.request).then((networkResponse) => {
-						cache.put(e.request, networkResponse.clone());
-						return networkResponse;
+						return fetch(e.request).then((networkResponse) => {
+							cache.put(e.request, networkResponse.clone());
+							return networkResponse;
+						})
 					})
 				})
-			})
-		);
+				);
+		}
 	}
+
 });

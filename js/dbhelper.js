@@ -53,8 +53,9 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static DATABASE_URL(path) {
-    const port = 1337 // Change this to your server port
-    return `http://localhost:${port}/${path}`;
+    // const port = 1337 // Change this to your server port
+    // return `http://localhost:${port}/${path}`;
+    return `https://dals-mws-server.herokuapp.com/${path}`;
   }
 
   static toast(message) {
